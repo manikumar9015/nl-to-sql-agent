@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # Service for the primary SQL database
+  postgres:
+    image: postgres:15
+    container_name: local-lab-postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin_password
+      - POSTGRES_DB=sales_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d sales_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Service for storing conversation metadata and audit logs
+  mongo:
+    image: mongo:latest
+    container_name: local-lab-mongo
+    restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root_password
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodata:/data/db
+
+# Volumes to persist data even if containers are removed
+volumes:
+  pgdata:
+  mongodata:
