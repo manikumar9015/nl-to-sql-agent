@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import api from '../api'; // Use our new central api service
+import api from '../api';
 
 const AuthContext = createContext(null);
 
@@ -8,8 +8,6 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('authToken') || null);
 
   useEffect(() => {
-    // On initial load, if we have a token, try to fetch user info
-    // This keeps the user logged in on page refresh
     const storedUser = localStorage.getItem('user');
     if (token && storedUser) {
       setUser(JSON.parse(storedUser));
@@ -25,6 +23,14 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('user', JSON.stringify(user));
   };
 
+  // --- NEW REGISTER FUNCTION ---
+  const register = async (username, password) => {
+    // We don't need to handle the response other than to see if it succeeded.
+    // The user will be redirected to log in after successful registration.
+    await api.post('/auth/register', { username, password });
+  };
+  // -------------------------
+
   const logout = () => {
     setToken(null);
     setUser(null);
@@ -33,13 +39,13 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    // --- ADD register TO THE CONTEXT VALUE ---
+    <AuthContext.Provider value={{ user, token, login, logout, register }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Custom hook to easily use the auth context in other components
 export const useAuth = () => {
   return useContext(AuthContext);
 };

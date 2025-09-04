@@ -2,28 +2,50 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
+  const [isRegistering, setIsRegistering] = useState(false); // State to toggle between modes
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const [success, setSuccess] = useState('');
+  const { login, register } = useAuth(); // Get the new register function
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     try {
-      await login(username, password);
-      // On successful login, the App component will automatically redirect
+      if (isRegistering) {
+        await register(username, password);
+        setSuccess('Registration successful! Please log in.');
+        setIsRegistering(false); // Switch back to login mode
+        setUsername('');
+        setPassword('');
+      } else {
+        await login(username, password);
+      }
     } catch (err) {
-      setError('Failed to log in. Please check your credentials.');
+      // Get a more specific error message from the backend if available
+      setError(err.response?.data?.error || 'An error occurred. Please try again.');
       console.error(err);
     }
+  };
+
+  const toggleMode = () => {
+    setIsRegistering(!isRegistering);
+    setError('');
+    setSuccess('');
+    setUsername('');
+    setPassword('');
   };
 
   return (
     <div className="flex items-center justify-center h-screen bg-zinc-200">
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-center text-black">Local Data Lab Login</h2>
+        <h2 className="text-2xl font-bold text-center text-black">
+          {isRegistering ? 'Create a New Account' : 'Local Data Lab Login'}
+        </h2>
         <form className="space-y-6" onSubmit={handleSubmit}>
+          {success && <p className="text-center text-sm text-green-600">{success}</p>}
           <div>
             <label className="text-sm font-bold text-black block">Username</label>
             <input
@@ -50,10 +72,19 @@ const LoginPage = () => {
               type="submit"
               className="w-full py-2 px-4 bg-black text-white font-semibold rounded-md hover:bg-zinc-800"
             >
-              Login
+              {isRegistering ? 'Register' : 'Login'}
             </button>
           </div>
         </form>
+        <p className="text-sm text-center text-black">
+          {isRegistering ? 'Already have an account?' : "Don't have an account?"}
+          <span
+            onClick={toggleMode}
+            className="font-semibold hover:underline cursor-pointer ml-1"
+          >
+            {isRegistering ? 'Login' : 'Register'}
+          </span>
+        </p>
       </div>
     </div>
   );

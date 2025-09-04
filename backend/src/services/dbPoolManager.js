@@ -11,10 +11,8 @@ const postgresConfig = {
   port: parseInt(process.env.POSTGRES_PORT, 10),
 };
 
-// A pool is better than a single client for handling multiple concurrent requests.
 const pgPool = new Pool(postgresConfig);
 
-// Test the PostgreSQL connection
 pgPool.query('SELECT NOW()', (err, res) => {
   if (err) {
     console.error('❌ Error connecting to PostgreSQL:', err.stack);
@@ -26,13 +24,11 @@ pgPool.query('SELECT NOW()', (err, res) => {
 
 // --- MongoDB Client ---
 
-// Connection URI for MongoDB
 const mongoUri = `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_HOST}:${process.env.MONGO_PORT}/?authSource=admin`;
 const mongoClient = new MongoClient(mongoUri);
 
 let mongoDbInstance;
 
-// Asynchronous function to connect to MongoDB
 async function connectToMongo() {
   try {
     await mongoClient.connect();
@@ -40,12 +36,10 @@ async function connectToMongo() {
     mongoDbInstance = mongoClient.db(process.env.MONGO_DB_NAME);
   } catch (err) {
     console.error('❌ Error connecting to MongoDB:', err);
-    // Exit the process if we can't connect to a critical service
     process.exit(1);
   }
 }
 
-// Function to get the MongoDB database instance
 function getMongoDb() {
   if (!mongoDbInstance) {
     console.error('MongoDB not connected. Call connectToMongo() first.');
@@ -55,13 +49,12 @@ function getMongoDb() {
 }
 
 /**
- * In a multi-database setup as per the plan, this is where you'd have a map of pools.
- * For now, we'll just export the single pool.
- * The key 'default' represents our primary sales_db.
+ * The source of truth for all configured SQL database connections.
  */
 const databasePools = {
   'sales_db': pgPool,
-  // 'marketing_db': new Pool(...) // This is how you would add more
+  'marketing_db': null,
+  // 'marketing_db': new Pool(...) // This is where you would add more databases
 };
 
 function getDbPool(dbName = 'sales_db') {
@@ -72,8 +65,21 @@ function getDbPool(dbName = 'sales_db') {
   return pool;
 }
 
+
+// --- ADD THIS NEW FUNCTION ---
+/**
+ * Returns a list of names of all configured databases.
+ * @returns {Array<string>} An array of database names.
+ */
+function getAvailableDatabases() {
+  return Object.keys(databasePools);
+}
+// ----------------------------
+
+
 module.exports = {
   getDbPool,
   connectToMongo,
   getMongoDb,
+  getAvailableDatabases, // <-- Add the new function to the exports
 };

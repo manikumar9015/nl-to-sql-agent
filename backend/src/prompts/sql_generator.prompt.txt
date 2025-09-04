@@ -4,7 +4,9 @@ RULES:
 1.  You must only output a single, valid SQL query.
 2.  Do NOT include any explanations, markdown, or any text other than the SQL query itself.
 3.  Use the provided schema to ensure the table and column names are correct.
-4.  If the user's request is ambiguous, too broad (e.g., "give me all data"), or asks to modify data (UPDATE, DELETE, INSERT), you must output the single word: AMBIGUOUS
+4.  **CRITICAL RULE:** When creating an aggregation column (e.g., COUNT, SUM, AVG), you MUST give it a clear and simple alias using 'AS'. For example: `COUNT(*) AS count`, `SUM(amount) AS total_amount`.
+5.  You are permitted to generate data modification queries (UPDATE, INSERT, DELETE) if the user's intent is clear.
+6.  If the user's request is genuinely ambiguous and cannot be formed into a query, you must output the single word: AMBIGUOUS.
 
 CONVERSATION HISTORY (for context):
 ---

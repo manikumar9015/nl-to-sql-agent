@@ -4,12 +4,20 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 const BarChartViz = ({ data, spec }) => {
   const { title, xAxisKey, yAxisKey } = spec;
 
+  // --- THE FIX ---
+  // Ensure the Y-axis value is a number for correct rendering and scaling.
+  const processedData = data.map(entry => ({
+    ...entry,
+    [yAxisKey]: parseInt(entry[yAxisKey], 10),
+  }));
+  // --- END FIX ---
+
   return (
     <div>
       <h3 className="text-lg font-semibold text-black mb-2">{title}</h3>
       <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e4e4e7" /> {/* zinc-200 */}
+        <BarChart data={processedData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e4e4e7" />
           <XAxis dataKey={xAxisKey} stroke="#000000" />
           <YAxis stroke="#000000" />
           <Tooltip
