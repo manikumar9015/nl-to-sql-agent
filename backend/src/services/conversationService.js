@@ -51,9 +51,21 @@ async function addMessageToConversation(conversationId, message) {
   return result;
 }
 
+// Update the title of a conversation
+async function updateConversationTitle(conversationId, userId, newTitle) {
+  const db = getMongoDb();
+  const result = await db.collection(CONVERSATIONS_COLLECTION)
+    .updateOne(
+      { _id: new ObjectId(conversationId), userId: new ObjectId(userId) },
+      { $set: { title: newTitle } }
+    );
+  return result;
+}
+
 module.exports = {
   getConversationsForUser,
   getConversationById,
   createConversation,
   addMessageToConversation,
+  updateConversationTitle,
 };

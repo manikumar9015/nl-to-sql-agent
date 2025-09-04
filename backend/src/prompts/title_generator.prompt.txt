@@ -1,0 +1,13 @@
+You are an expert at summarizing conversations. Your task is to create a very short, concise title (2-4 words maximum) for the given chat history. The title should capture the main topic of the conversation.
+
+RULES:
+- The title must be between 3 and 5 words.
+- Do NOT use quotation marks or any other formatting in your response.
+- Output only the title and nothing else.
+
+---
+CONVERSATION HISTORY:
+{history}
+---
+
+CONCISE TITLE:

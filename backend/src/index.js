@@ -346,6 +346,41 @@ app.get('/api/databases', authMiddleware, (req, res) => {
   }
 });
 
+const titleGeneratorPrompt = require('fs').readFileSync('./src/prompts/title_generator.prompt.txt', 'utf-8');
+
+// --- NEW ENDPOINT TO UPDATE A CONVERSATION TITLE ---
+app.put('/api/conversations/:id/title', authMiddleware, async (req, res) => {
+  const conversationId = req.params.id;
+  const userId = req.user.userId;
+
+  try {
+    const conversation = await conversationService.getConversationById(conversationId, userId);
+
+    // Security and idempotency checks
+    if (!conversation) {
+      return res.status(404).json({ error: 'Conversation not found.' });
+    }
+    if (conversation.title !== 'New Chat') {
+      return res.status(400).json({ error: 'Conversation already has a title.' });
+    }
+
+    const historyString = conversation.messages
+      .map(turn => `${turn.sender === 'user' ? 'User' : 'Bot'}: ${turn.text}`)
+      .join('\n');
+
+    const finalPrompt = titleGeneratorPrompt.replace('{history}', historyString);
+
+    const newTitle = await aiClient.generateText(finalPrompt);
+
+    await conversationService.updateConversationTitle(conversationId, userId, newTitle.trim());
+
+    res.json({ success: true, newTitle: newTitle.trim() });
+  } catch (error) {
+    console.error("Failed to generate title:", error);
+    res.status(500).json({ error: 'Failed to generate title.' });
+  }
+});
+
 // =================================================================
 // --- Server Startup ---
 // =================================================================
