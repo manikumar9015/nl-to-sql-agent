@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 
 import Header from './Header';
 import MessageList from './MessageList';
@@ -34,7 +34,7 @@ const ChatWindow = () => {
     const conversationHistory = updatedMessages.slice(-10);
 
     try {
-      const response = await axios.post('http://localhost:3001/api/agent/chat', {
+      const response = await api.post('/agent/chat', {
         prompt: currentInput,
         dbName: selectedDb,
         conversationHistory: conversationHistory,
