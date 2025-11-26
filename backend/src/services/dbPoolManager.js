@@ -51,9 +51,12 @@ function getMongoDb() {
 /**
  * The source of truth for all configured SQL database connections.
  */
+const salesDbConfig = { ...postgresConfig, database: 'sales_db' };
+const studentDbConfig = { ...postgresConfig, database: 'student_db' };
+
 const databasePools = {
-  'sales_db': pgPool,
-  'marketing_db': null,
+  'sales_db': new Pool(salesDbConfig),
+  'student_db' : new Pool(studentDbConfig)
   // 'marketing_db': new Pool(...) // This is where you would add more databases
 };
 

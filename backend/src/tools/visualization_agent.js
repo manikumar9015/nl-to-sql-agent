@@ -10,8 +10,10 @@ const promptTemplate = fs.readFileSync(
 /**
  * Creates a visualization package from execution results.
  * @param {string} userPrompt The original user question.
+ * @param {string} generatedSql The SQL that was executed.
  * @param {object} executionMetadata Metadata from the sql_executor.
  * @param {Array<object>} maskedSample A sample of the result data.
+ * @param {Array<object>} conversationHistory Conversation turns.
  * @returns {Promise<object>} A visualization package (visPackage).
  */
 async function createVisualization(
@@ -25,7 +27,7 @@ async function createVisualization(
   if (!maskedSample || maskedSample.length === 0) {
     return {
       type: "scalar",
-      visSpec: { title: "No Results", xAxisKey: null, yAxisKey: null },
+      visSpec: { title: "No Results" },
       summary: "The query returned no results.",
     };
   }
@@ -34,8 +36,8 @@ async function createVisualization(
   const sanitizedSample = maskedSample.map((row) => {
     const newRow = { ...row };
     for (const col of sensitiveColumns) {
-      if (newRow[col]) {
-        newRow[col] = `<MASKED_${col.toUpperCase()}>`;
+      if (newRow[col] !== undefined) {
+        newRow[col] = `{{${col.toUpperCase()}}}`; // placeholder format
       }
     }
     return newRow;
@@ -63,22 +65,41 @@ async function createVisualization(
   console.log("--- Visualization Agent Raw Response ---");
   console.log(visResponse);
 
+  let visPackage;
   try {
     const cleanedJson = visResponse
       .replace(/```/g, "")
       .replace("json", "")
       .trim();
-    const result = JSON.parse(cleanedJson);
-    return result;
+    visPackage = JSON.parse(cleanedJson);
   } catch (error) {
     console.error("Failed to parse Visualization LLM response as JSON:", error);
-    // Return a default "table" view if parsing fails
     return {
       type: "table",
-      visSpec: { title: "Query Results", xAxisKey: null, yAxisKey: null },
+      visSpec: { title: "Query Results" },
       summary: "Could not automatically determine the best visualization.",
     };
   }
+
+  // --- NEW LOGIC: Post-process the summary placeholders ---
+  if (visPackage.summary) {
+    let finalSummary = visPackage.summary;
+    const placeholders = finalSummary.match(/\{\{[A-Z_]+\}\}/g) || [];
+
+    // Use the first row of original (unsanitized) data
+    const firstRow = maskedSample[0];
+
+    for (const placeholder of placeholders) {
+      const columnName = placeholder.replace(/\{|\}/g, "").toLowerCase();
+      if (firstRow[columnName] !== undefined) {
+        finalSummary = finalSummary.replace(placeholder, firstRow[columnName]);
+      }
+    }
+    visPackage.summary = finalSummary;
+  }
+  // --- END NEW LOGIC ---
+
+  return visPackage;
 }
 
 module.exports = {

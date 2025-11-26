@@ -1,0 +1,89 @@
+Of course! It's essential to have a clear and simple guide for starting and stopping your work.
+
+Here are the commands, broken down into the two main tasks. You will need three separate terminals for the "start" process.
+
+How to Stop Everything
+
+You can do this in any order.
+
+Stop the Frontend Server:
+
+Go to the terminal running your React app (the one in the frontend folder).
+
+Press Ctrl + C.
+
+Stop the Backend Server:
+
+Go to the terminal running your Node.js app (the one in the backend folder).
+
+Press Ctrl + C.
+
+Stop the Database Containers:
+
+Go to a terminal and navigate to your deploy folder.
+
+Run the following command:
+
+docker-compose down
+```    (This command safely stops and removes the containers. Your data is safe because we use Docker volumes).
+How to Start Everything
+
+The order is important here: Databases → Backend → Frontend.
+
+(Terminal 1) Start the Databases:
+
+Navigate to your deploy folder.
+
+Run the following command to start PostgreSQL and MongoDB in the background:
+
+docker-compose up -d
+
+
+(The -d means "detached", so it won't lock up your terminal).
+
+(Terminal 2) Start the Backend Server:
+
+Navigate to your backend folder.
+
+Run the development script:
+
+npm run dev
+
+Wait until you see the success messages ✅ Connected to PostgreSQL successfully... and ✅ Connected to MongoDB successfully. before moving to the next step.
+
+(Terminal 3) Start the Frontend Application:
+
+Navigate to your frontend folder.
+
+Run the development script:
+
+code
+Bash
+download
+content_copy
+expand_less
+IGNORE_WHEN_COPYING_START
+IGNORE_WHEN_COPYING_END
+npm run dev
+
+Your browser should open to http://localhost:5173, where you'll see the login screen.
+
+Quick Reference Summary
+
+You can save this as a quick reminder.
+
+To Stop:
+
+Frontend Terminal: Ctrl + C
+
+Backend Terminal: Ctrl + C
+
+deploy Folder Terminal: docker-compose down
+
+To Start:
+
+deploy Folder Terminal: docker-compose up -d
+
+backend Folder Terminal: npm run dev (wait for DB connections)
+
+frontend Folder Terminal: npm run dev

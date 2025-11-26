@@ -4,22 +4,23 @@ You must respond in a strict JSON format. Do NOT output any other text or markdo
 
 The JSON output must have the following structure:
 {
-  "type": "CHART_TYPE",
+  "type": "chart_type",
   "visSpec": {
     "title": "A descriptive title for the chart.",
     "xAxisKey": "column_name_for_x_axis",
     "yAxisKey": "column_name_for_y_axis"
   },
-  "summary": "A brief, one-sentence summary of the data insights."
+   "summary": "A brief, one-sentence summary of the data insights. If you need to mention a specific value from a masked column (e.g., a name), use the column name as a placeholder in all caps, like this: {{COLUMN_NAME}}."
 }
 
 RULES FOR VISUALIZATION:
-1.  **Pay close attention to the SQL QUERY.** It is the ultimate source of truth for the data's structure.
-2.  If the SQL QUERY is a simple `SELECT * FROM ...` without aggregations, the user almost always wants a `table`. Default to `table` in this case.
-3.  If the SQL QUERY contains `GROUP BY`, the user likely wants a `bar` or `pie` chart.
-4.  If the SQL QUERY aggregates data over a date/time column, the user likely wants a `line` chart.
-5.  If the result has only one row and one number, use `scalar`.
-6.  `xAxisKey` should be the categorical/time column. `yAxisKey` should be the numerical column.
+1.  **Prioritize the SQL QUERY and data content.** It is the ultimate source of truth.
+2.  **TABLE is the default for raw data.** If the SQL QUERY is a simple `SELECT` that returns rows with text or multiple columns (like `SELECT * FROM ...` or `SELECT name, email FROM ...`), the correct type is almost always "table".
+3.  **SCALAR is ONLY for a single number.** Use "scalar" ONLY if the result is a single row with a single numerical column (e.g., from `SELECT COUNT(*) ...`).
+4.  **BAR/PIE charts are for aggregations.** If the SQL QUERY contains `GROUP BY`, the user likely wants a "bar" or "pie" chart.
+5.  **LINE charts are for time series.** If the SQL QUERY aggregates data over a date/time column, the user likely wants a "line" chart.
+6.  `xAxisKey` should be the categorical/time column. `yAxisKey` should be the numerical/value column.
+7.  **chart type must be in small letters**
 
 ---
 USER QUESTION:

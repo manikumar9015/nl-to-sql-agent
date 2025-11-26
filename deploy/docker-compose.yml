@@ -14,6 +14,7 @@ services:
       - "5434:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d # Mounts our init script
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin -d sales_db"]
       interval: 10s
