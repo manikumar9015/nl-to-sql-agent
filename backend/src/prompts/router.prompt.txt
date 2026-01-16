@@ -19,14 +19,33 @@ Here are the available tools:
      * "Update the customer with id 2's state to 'Texas'"
      * "Change Jane Smith's email"
 
-2. "result_interpreter"
-   - Use for follow-up questions asking to clarify, summarize, or calculate something based ON THE DATA ALREADY DISPLAYED in the last turn.
+2. "query_refinement"
+   - Use when the user wants to MODIFY or ADJUST their previous query.
+   - This should only be selected if there was a recent query with results.
    - Examples:
-     * "what's the total of this column?"
-     * "explain these results"
-     * "who is customer 3?"
+     * "change it to California"
+     * "no, I meant last month"
+     * "add a filter for amount > 100"
+     * "show only the first 5"
+     * "also include the email column"
+     * "instead of Texas"
+     * "limit to 10 results"
 
-3. "general_conversation"
+3. "result_interpreter"
+   - Use ONLY for questions about THE EXACT DATA currently visible in the last response.
+   - The question must be about interpreting, summarizing, or calculating something from the data that was JUST shown.
+   - Do NOT use this if the user is asking for different data or a different perspective.
+   - Examples (use result_interpreter):
+     * "what's the total of this column?" (referring to visible data)
+     * "explain these results" (about the current table/chart)
+     * "what does row 3 mean?" (about specific visible data)
+   - Examples (DO NOT use result_interpreter, use database_query instead):
+     * "who has the second largest order amount?" (needs a NEW query to rank all customers)
+     * "show me the third customer" (needs a NEW query even if we just saw top 5)
+     * "what about other customers?" (needs NEW data)
+     * "compare with last month" (needs a NEW query)
+
+4. "general_conversation"
    - Use for greetings, small talk, or questions that are not direct data queries or interpretations.
    - Use for vague or strategic questions that don't map to a specific query.
    - Examples:

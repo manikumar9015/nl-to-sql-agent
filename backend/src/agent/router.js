@@ -20,6 +20,12 @@ async function route(userPrompt, conversationHistory = []) {
   const routerResponse = await generateText(finalPrompt);
   console.log("--- Router Raw Response ---", routerResponse);
 
+  // Handle security guard blocking
+  if (routerResponse.includes("blocked by a security guard")) {
+    console.warn("[ROUTER] Query blocked by security guard, defaulting to general_conversation");
+    return "general_conversation";
+  }
+
   try {
     const cleanedJson = routerResponse
       .replace(/```/g, "")
