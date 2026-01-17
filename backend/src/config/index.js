@@ -4,39 +4,43 @@
  */
 
 require('dotenv').config();
+const { validateEnv } = require('./envSchema');
+
+// Validate environment variables at startup
+const env = validateEnv();
 
 const config = {
   // Server Configuration
-  port: process.env.PORT || 3001,
-  nodeEnv: process.env.NODE_ENV || 'development',
+  port: env.PORT || 3001,
+  nodeEnv: env.NODE_ENV || 'development',
 
   // Database Configuration
   postgres: {
-    host: process.env.POSTGRES_HOST,
-    port: process.env.POSTGRES_PORT,
-    database: process.env.POSTGRES_DB,
-    user: process.env.POSTGRES_USER,
-    password: process.env.POSTGRES_PASSWORD,
+    host: env.POSTGRES_HOST,
+    port: env.POSTGRES_PORT,
+    database: env.POSTGRES_DB,
+    user: env.POSTGRES_USER,
+    password: env.POSTGRES_PASSWORD,
   },
 
   mongodb: {
-    uri: process.env.MONGO_URI,
+    uri: env.MONGO_URI,
   },
 
   // Authentication Configuration
   jwt: {
-    secret: process.env.JWT_SECRET || 'your-secret-key',
+    secret: env.JWT_SECRET || 'your-secret-key',
     expiresIn: '24h',
   },
 
   // AI Configuration
   gemini: {
-    apiKey: process.env.GEMINI_API_KEY,
+    apiKey: env.GEMINI_API_KEY,
   },
 
   // CORS Configuration
   cors: {
-    origin: process.env.CORS_ORIGIN || '*',
+    origin: env.CORS_ORIGIN || '*',
   },
 };
 

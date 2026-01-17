@@ -61,11 +61,12 @@ const databasePools = {
 };
 
 function getDbPool(dbName = 'sales_db') {
-  const pool = databasePools[dbName];
-  if (!pool) {
-    throw new Error(`Database pool for '${dbName}' not found.`);
+  if (!databasePools[dbName]) {
+    console.log(`Creating new connection pool for database: ${dbName}`);
+    const newDbConfig = { ...postgresConfig, database: dbName };
+    databasePools[dbName] = new Pool(newDbConfig);
   }
-  return pool;
+  return databasePools[dbName];
 }
 
 

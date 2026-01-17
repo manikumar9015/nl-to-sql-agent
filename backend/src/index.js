@@ -2,7 +2,9 @@
 require("dotenv").config();
 const cors = require("cors");
 const express = require("express");
+const swaggerUi = require("swagger-ui-express");
 const config = require("./config");
+const swaggerSpec = require("./config/swagger");
 const dbManager = require("./services/dbPoolManager");
 const errorHandler = require("./middleware/errorHandler");
 const logger = require("./utils/logger");
@@ -11,6 +13,12 @@ const logger = require("./utils/logger");
 const app = express();
 app.use(cors());
 app.use(express.json()); // Middleware to parse JSON bodies
+
+// --- Swagger API Documentation ---
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'QueryCompass API Docs',
+}));
 
 // --- MOUNT ROUTES ---
 app.use('/api', require('./routes/agent'));

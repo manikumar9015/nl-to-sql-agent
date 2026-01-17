@@ -1,0 +1,6 @@
+Starting verification script...
+Environment loaded.
+dbPoolManager imported.
+Testing connection to blogpage_db...
+Pool obtained for blogpage_db
+✅ Connection successful! Result: {"val":1}
